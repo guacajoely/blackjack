@@ -30,15 +30,15 @@ static void newHand()
         Cards[new Random().Next(1, 13)]
     };
 
-        int playerScore = playerHand.Sum(x => x.Value);
+        int playerScore = GetScore(playerHand);
 
-        List<Card> dealerHand = new List<Card>()
+    List<Card> dealerHand = new List<Card>()
     {
         Cards[new Random().Next(1, 13)],
         Cards[new Random().Next(1, 13)]
     };
 
-    int dealerScore = dealerHand.Sum(x => x.Value);
+    int dealerScore = GetScore(dealerHand);
 
     Console.WriteLine($"You've been dealt a {playerHand[0].Name} and a {playerHand[1].Name} totaling {playerScore}");
     Console.WriteLine($"The dealer is showing a {dealerHand[0].Name}");
@@ -57,7 +57,7 @@ static void newHand()
             playerHand.Add(playersNewCard);
 
             //recalculate player's score
-            playerScore = playerHand.Sum(x => x.Value);
+            playerScore = GetScore(playerHand);
 
             //inform user what card was dealt and their new current score
             Console.WriteLine($"You got dealt a {playersNewCard.Name} making your new total {playerScore}");
@@ -78,7 +78,14 @@ static void newHand()
                 dealerHand.Add(dealersNewCard);
 
                 //recalculate dealer's score
-                dealerScore = dealerHand.Sum(x => x.Value);
+                dealerScore = GetScore(dealerHand);
+
+                //if score > 21, and hand contains ace, lower value to 1
+                if (dealerScore > 21 && dealerHand.Any(x => x.Value == 11))
+                {
+                    int matchingIndex = dealerHand.FindIndex(x => x.Value == 11);
+                    dealerHand[matchingIndex].Value = 1;
+                }
 
                 //inform user what card the dealer was dealt and their new current score is
                 Console.WriteLine($"The dealer drew a {dealersNewCard.Name} making their new total {dealerScore}");
@@ -120,6 +127,20 @@ static void newHand()
         Replay();
     }
 }
+
+
+//gets score of cards and if total exceeds 21 and there is an ace, reduces its value to 1
+static int GetScore(List<Card> hand)
+{
+    if (hand.Sum(x => x.Value) > 21 && hand.Any(x => x.Value == 11))
+    {
+        int matchingIndex = hand.FindIndex(x => x.Value == 11);
+        hand[matchingIndex].Value = 1;
+    }
+
+    return hand.Sum(x => x.Value);
+}
+
 static void Replay()
 {
     Console.WriteLine();
